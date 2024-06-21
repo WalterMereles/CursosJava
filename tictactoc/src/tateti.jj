@@ -1,0 +1,121 @@
+PARSER_BEGIN(tateti)
+
+import java.util.Scanner;
+
+public class tateti {
+    private static char[][] tablero = new char[3][3];
+    private static char jugadorActual = 'X';
+    
+    public static void main(String[] args) throws ParseException {
+        iniciarTablero();
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            imprimirTablero();
+            System.out.println("Jugador " + jugadorActual + ", introduce tu movimiento (fila y columna): ");
+            String jugada = scanner.nextLine();
+            if (jugada.length() != 2) {
+                System.out.println("Entrada no valida. Por favor, introduce dos digitos para fila y columna");
+                continue;
+            }
+            try {
+                int fila = Integer.parseInt(jugada.substring(0, 1));
+                int col = Integer.parseInt(jugada.substring(1, 2));
+                movimiento(fila, col);
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada no valida. Por favor, introduce dos digitos para fila y columna.");
+                continue;
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+            if (Ganador()) {
+                imprimirTablero();
+                System.out.println("Jugador " + jugadorActual + " gana");
+                break;
+            }
+            if (tableroCompleto()) {
+                imprimirTablero();
+                System.out.println("El juego es un empate manco");
+                break;
+            }
+            cambiarJugador();
+        }
+    }
+    
+    private static void iniciarTablero() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                tablero[i][j] = '-';
+            }
+        }
+    }
+
+    private static void imprimirTablero() {
+        System.out.println("  0 1 2");
+        for (int i = 0; i < 3; i++) {
+            System.out.print(i + " ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(tablero[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    private static boolean tableroCompleto() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (tablero[i][j] == '-') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void cambiarJugador() {
+        jugadorActual = (jugadorActual == 'X') ? 'O' : 'X';
+    }
+
+    private static boolean Ganador() {
+        // Comprobar filas y columnas
+        for (int i = 0; i < 3; i++) {
+            if ((tablero[i][0] == jugadorActual && tablero[i][1] == jugadorActual && tablero[i][2] == jugadorActual) ||
+                (tablero[0][i] == jugadorActual && tablero[1][i] == jugadorActual && tablero[2][i] == jugadorActual)) {
+                return true;
+            }
+        }
+        // Comprobar diagonales
+        if ((tablero[0][0] == jugadorActual && tablero[1][1] == jugadorActual && tablero[2][2] == jugadorActual) ||
+            (tablero[0][2] == jugadorActual && tablero[1][1] == jugadorActual && tablero[2][0] == jugadorActual)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static void movimiento(int fila, int col) throws ParseException {
+        if (fila < 0 || fila >= 3 || col < 0 || col >= 3 || tablero[fila][col] != '-') {
+            throw new ParseException("Movimiento no valido. Intentalo de nuevo.");
+        }
+        tablero[fila][col] = jugadorActual;
+    }
+}
+
+PARSER_END(tateti)
+
+SKIP : {
+    " " | "\t" | "\n" | "\r"
+}
+
+TOKEN : {
+    < DIGIT: ["0"-"2"] >
+}
+
+void jugada() :
+{}
+{
+    <DIGIT> <DIGIT> { 
+        int fila = Integer.parseInt(token.image.substring(0, 1));
+        int col = Integer.parseInt(token.image.substring(1, 2));
+        movimiento(fila, col);
+    }
+}

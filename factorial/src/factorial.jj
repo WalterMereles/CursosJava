@@ -1,0 +1,33 @@
+PARSER_BEGIN(Factorial)
+
+import java.util.Scanner;
+
+public class Factorial {
+    public static void main(String[] args) throws ParseException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Introduce un numero para calcular su factorial: ");
+        int num = scanner.nextInt();
+        System.out.println("El factorial de " + num + " es: " + Factorial(num));
+    }
+    
+    static int Factorial(int n) {
+        if (n == 0) return 1;
+        else return n * Factorial(n-1);
+    }
+}
+
+PARSER_END(Factorial)
+
+SKIP : {
+    " " | "\t" | "\n" | "\r"
+}
+
+TOKEN : {
+    < NUMBER: (["0"-"9"])+ >
+}
+
+void Input() :
+{}
+{
+    <NUMBER>
+}
